@@ -66,7 +66,8 @@ export default function Home() {
       const iframeWindow = iframe.contentWindow;
       const messages: ConsoleMessage[] = [];
       if (iframeWindow) {
-        iframeWindow.console = {
+        // Type assertion to allow console override
+        (iframeWindow as any).console = {
           log: (...args: unknown[]) => {
             messages.push({ type: 'log', message: args.map(arg => String(arg)).join(' '), timestamp: Date.now() });
           },
@@ -79,9 +80,9 @@ export default function Home() {
           info: (...args: unknown[]) => {
             messages.push({ type: 'info', message: args.map(arg => String(arg)).join(' '), timestamp: Date.now() });
           },
-        } as Console;
+        };
         try {
-          (iframeWindow as unknown as { eval: (code: string) => void }).eval(code);
+          (iframeWindow as any).eval(code);
           setConsoleMessages(messages);
         } catch (error: unknown) {
           messages.push({ type: 'error', message: error instanceof Error ? error.message : String(error), timestamp: Date.now() });
